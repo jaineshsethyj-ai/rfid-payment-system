@@ -3,14 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RFID Card Management System</title>
+    <title>RFID Card Management System - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -18,719 +12,255 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #6a11cb;
-            --primary-light: #7d29ff;
-            --secondary: #2575fc;
-            --success: #00b09b;
-            --warning: #ffa726;
-            --danger: #ff416c;
-            --light: #f8f9ff;
-            --dark: #2d3748;
-            --gray: #718096;
-            --gray-light: #e2e8f0;
-            --accent: #00d4ff;
-            --accent-light: #80e1ff;
-        }
-
         body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #f5f7ff 0%, #e3e9ff 100%);
-            color: var(--dark);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
         }
 
-        body::before {
-            content: '';
+        /* Login Screen Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .password-input-group {
+            position: relative;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .login-hint {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            color: #3498db;
+            font-size: 0.85rem;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .attempts-counter {
+            margin-top: 10px;
+            color: #e74c3c;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Main Application Styles (Hidden Initially) */
+        .main-app {
+            display: none;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Greeting Screen */
+        .greeting-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(106, 17, 203, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 10%, rgba(37, 117, 252, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 20%);
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 30px 40px;
-            border-radius: 24px;
-            margin-bottom: 40px;
-            box-shadow: 0 20px 40px rgba(106, 17, 203, 0.2);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
-            background-size: cover;
-        }
-
-        .logo-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .logo {
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 32px;
-            backdrop-filter: blur(5px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
         }
 
-        header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.8rem;
+        .greeting-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .greeting-content {
+            text-align: center;
+            color: white;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .greeting-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .greeting-text {
+            font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        header p {
+        .greeting-subtext {
             font-size: 1.2rem;
             opacity: 0.9;
-            position: relative;
-            z-index: 1;
-            max-width: 600px;
         }
 
-        /* Navigation Tabs */
-        .nav-tabs-container {
+        .greeting-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 30px auto 0;
+            overflow: hidden;
+        }
+
+        .greeting-progress-bar {
+            height: 100%;
             background: white;
-            border-radius: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-            padding: 10px;
-            border: 1px solid var(--gray-light);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            width: 0;
+            border-radius: 2px;
+            animation: progress 2s ease-out forwards;
         }
 
-        .nav-tab {
-            flex: 1;
-            min-width: 180px;
-            text-align: center;
-            padding: 22px 20px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-radius: 16px;
-            background: white;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 1.1rem;
-            border: 2px solid transparent;
-        }
-
-        .nav-tab:hover {
-            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
-            color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.1);
-        }
-
-        .nav-tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 15px 30px rgba(106, 17, 203, 0.25);
-            border-color: var(--primary-light);
-            animation: tabPulse 2s infinite;
-        }
-
-        @keyframes tabPulse {
-            0%, 100% { box-shadow: 0 15px 30px rgba(106, 17, 203, 0.25); }
-            50% { box-shadow: 0 20px 40px rgba(106, 17, 203, 0.35); }
-        }
-
-        .nav-tab i {
-            font-size: 1.3rem;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.6s ease;
-        }
-
+        /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .tab-content.active {
-            display: block;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
-        /* Card Styles */
-        .card {
-            background: white;
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            margin-bottom: 35px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid var(--gray-light);
-            position: relative;
-            overflow: hidden;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--primary), var(--secondary));
-            border-radius: 24px 0 0 24px;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
-        }
-
-        .card-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
-            color: var(--dark);
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--gray-light);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .card-title i {
-            color: var(--primary);
-            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2rem;
-        }
-
-        /* Form Styles */
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            flex: 1;
-            min-width: 280px;
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
-            color: var(--dark);
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-        }
-
-        .required::after {
-            content: " *";
-            color: var(--danger);
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 18px 20px;
-            border: 2px solid var(--gray-light);
-            border-radius: 16px;
-            font-size: 1.05rem;
-            font-family: 'Nunito', sans-serif;
-            transition: all 0.3s ease;
-            background: white;
-            color: var(--dark);
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.1);
-            transform: translateY(-2px);
-        }
-
-        /* RFID Input Area */
-        .rfid-input-area {
-            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 2px dashed var(--primary-light);
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .rfid-input-area:hover {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, #f0f2ff, #e6e9ff);
-            transform: translateY(-3px);
-        }
-
-        .rfid-input-area i {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .rfid-input-area p {
-            font-size: 1.2rem;
-            color: var(--dark);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .rfid-help-text {
-            font-size: 0.95rem;
-            color: var(--gray);
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        /* Button Styles */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 20px 36px;
-            border: none;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: center;
-            font-family: 'Poppins', sans-serif;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.2);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(106, 17, 203, 0.3);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #00d4a7);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 20px 40px rgba(0, 176, 155, 0.3);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning), #ffb74d);
-        }
-
-        .btn-warning:hover {
-            box-shadow: 0 20px 40px rgba(255, 167, 38, 0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #ff6b95);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 20px 40px rgba(255, 65, 108, 0.3);
-        }
-
-        /* Balance Display */
-        .balance-display {
-            background: linear-gradient(135deg, var(--success), var(--accent));
-            color: white;
-            padding: 40px;
-            border-radius: 24px;
-            text-align: center;
-            margin-bottom: 35px;
-            box-shadow: 0 25px 50px rgba(0, 176, 155, 0.25);
-            position: relative;
-            overflow: hidden;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .balance-display::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: moveBackground 20s linear infinite;
-        }
-
-        @keyframes moveBackground {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .balance-amount {
-            font-size: 4.5rem;
-            font-weight: 800;
-            margin: 20px 0;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            font-family: 'Poppins', sans-serif;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Menu Grid */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .menu-item {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-            border: 2px solid transparent;
-        }
-
-        .menu-item:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-            border-color: var(--primary-light);
-        }
-
-        .menu-item.selected {
-            border: 3px solid var(--primary);
-            box-shadow: 0 20px 40px rgba(106, 17, 203, 0.2);
-        }
-
-        .menu-item-image {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            background-color: #f0f2ff;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-item-image::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 50%;
-            background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
-        }
-
-        .menu-item-content {
-            padding: 25px;
-        }
-
-        .menu-item-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-
-        .menu-item-price {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--success);
-            margin-bottom: 20px;
-        }
-
-        /* Order Summary */
-        .order-summary {
-            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
-            border-radius: 24px;
-            padding: 35px;
-            margin-top: 40px;
-            border: 2px solid var(--gray-light);
-        }
-
-        .order-items {
-            list-style: none;
-            margin-bottom: 30px;
-            max-height: 350px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .order-items::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .order-items::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .order-items::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .order-items li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .order-items li:hover {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            transform: translateX(5px);
-        }
-
-        .order-items li:last-child {
-            border-bottom: none;
-        }
-
-        .total-amount {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--dark);
-            text-align: right;
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 3px dashed var(--primary-light);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Status Messages */
-        .status-message {
-            padding: 22px;
-            border-radius: 18px;
-            margin-bottom: 30px;
-            display: none;
-            animation: slideIn 0.6s ease;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            border: 1px solid transparent;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .status-message.success {
-            background: linear-gradient(135deg, rgba(0, 176, 155, 0.1), rgba(0, 212, 255, 0.1));
-            color: #006b5c;
-            border-color: rgba(0, 176, 155, 0.3);
-        }
-
-        .status-message.error {
-            background: linear-gradient(135deg, rgba(255, 65, 108, 0.1), rgba(255, 107, 149, 0.1));
-            color: #b00020;
-            border-color: rgba(255, 65, 108, 0.3);
-        }
-
-        .status-message.info {
-            background: linear-gradient(135deg, rgba(106, 17, 203, 0.1), rgba(37, 117, 252, 0.1));
-            color: var(--primary);
-            border-color: rgba(106, 17, 203, 0.3);
-        }
-
-        /* Recharge Form */
-        .recharge-form {
-            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
-            border-radius: 24px;
-            padding: 40px;
-            margin-top: 40px;
-            border: 2px solid var(--gray-light);
-        }
-
-        .recharge-amounts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .amount-option {
-            flex: 1;
-            min-width: 140px;
-            text-align: center;
-            padding: 25px 15px;
-            background: white;
-            border: 3px solid var(--gray-light);
-            border-radius: 18px;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .amount-option:hover {
-            border-color: var(--primary);
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(106, 17, 203, 0.15);
-        }
-
-        .amount-option.selected {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-color: var(--primary-light);
-            box-shadow: 0 20px 40px rgba(106, 17, 203, 0.25);
-        }
-
-        /* Data Table */
-        .data-table-container {
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            margin-top: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--gray-light);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .data-table th {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            text-align: left;
-            padding: 25px 20px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.1rem;
-        }
-
-        .data-table td {
-            padding: 22px 20px;
-            border-bottom: 2px solid var(--gray-light);
-            transition: all 0.3s ease;
-        }
-
-        .data-table tr:hover td {
-            background: rgba(106, 17, 203, 0.03);
-            transform: translateX(5px);
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .badge-success {
-            background: linear-gradient(135deg, rgba(0, 176, 155, 0.1), rgba(0, 212, 255, 0.1));
-            color: var(--success);
-            border: 2px solid rgba(0, 176, 155, 0.3);
-        }
-
-        .badge-warning {
-            background: linear-gradient(135deg, rgba(255, 167, 38, 0.1), rgba(255, 183, 77, 0.1));
-            color: var(--warning);
-            border: 2px solid rgba(255, 167, 38, 0.3);
-        }
-
-        .badge-danger {
-            background: linear-gradient(135deg, rgba(255, 65, 108, 0.1), rgba(255, 107, 149, 0.1));
-            color: var(--danger);
-            border: 2px solid rgba(255, 65, 108, 0.3);
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 100%; }
         }
 
         /* Loading Spinner */
         .loading-spinner {
             display: inline-block;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
@@ -741,564 +271,1081 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            padding: 30px;
-            color: var(--gray);
-            font-size: 0.95rem;
-            border-top: 2px solid var(--gray-light);
+        /* Main App Styles (Original styles continue) */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: #f5f7fa;
         }
 
-        /* Stats Cards */
-        .stats-container {
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            margin-right: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .nav-tab i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .status-message.success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .status-message.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .status-message.info {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .balance-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item.selected {
+            border: 2px solid #667eea;
+            transform: translateY(-3px);
+        }
+
+        .menu-item-image {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .menu-item-content {
+            padding: 15px;
+        }
+
+        .menu-item-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .menu-item-price {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .order-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .order-items li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+
+        .badge-warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .badge-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .amount-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .amount-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .amount-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .amount-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
         .stat-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 18px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
         }
 
-        .stat-icon.blue {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-
-        .stat-icon.green {
-            background: linear-gradient(135deg, var(--success), var(--accent));
-        }
-
-        .stat-icon.orange {
-            background: linear-gradient(135deg, var(--warning), #ffb74d);
-        }
-
-        .stat-info h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.5rem;
+        .stat-value {
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--dark);
+            color: #2c3e50;
             margin-bottom: 5px;
         }
 
-        .stat-info p {
-            color: var(--gray);
-            font-size: 1rem;
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
         }
 
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .menu-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            
-            .nav-tab {
-                min-width: 160px;
-            }
-            
-            .balance-amount {
-                font-size: 3.8rem;
-            }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: auto;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            header {
-                padding: 25px;
-            }
-            
-            header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .nav-tabs-container {
-                flex-direction: column;
-            }
-            
-            .nav-tab {
-                min-width: 100%;
-                padding: 20px;
-            }
-            
-            .form-row {
-                flex-direction: column;
-            }
-            
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .balance-amount {
-                font-size: 3rem;
-            }
-            
-            .recharge-amounts {
-                flex-direction: column;
-            }
-            
-            .amount-option {
-                min-width: 100%;
-            }
-        }
-
-        /* Floating Elements */
-        .floating-element {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
-            opacity: 0.1;
-            z-index: -1;
-            animation: floatAround 20s infinite linear;
-        }
-
-        .floating-element:nth-child(1) {
-            top: 10%;
-            left: 5%;
-            width: 100px;
-            height: 100px;
-            animation-delay: 0s;
-        }
-
-        .floating-element:nth-child(2) {
-            top: 60%;
-            right: 10%;
-            width: 80px;
-            height: 80px;
-            animation-delay: -5s;
-        }
-
-        .floating-element:nth-child(3) {
-            bottom: 20%;
-            left: 15%;
-            width: 120px;
-            height: 120px;
-            animation-delay: -10s;
-        }
-
-        @keyframes floatAround {
-            0%, 100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(100px, -50px) rotate(90deg);
-            }
-            50% {
-                transform: translate(0, -100px) rotate(180deg);
-            }
-            75% {
-                transform: translate(-100px, -50px) rotate(270deg);
-            }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
         }
     </style>
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-element"></div>
-    <div class="floating-element"></div>
-    <div class="floating-element"></div>
-
-    <div class="container">
-        <!-- Firebase Connection Status -->
-        <div id="firebase-status" class="firebase-status" style="position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 24px; border-radius: 50px; background: linear-gradient(135deg, #ff416c, #ff6b95); color: white; box-shadow: 0 10px 20px rgba(255, 65, 108, 0.3); display: flex; align-items: center; gap: 10px; font-weight: 600;">
-            <i class="fas fa-plug"></i>
-            <span>Connecting to Firebase...</span>
-        </div>
-
-        <header>
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-id-card"></i>
-                </div>
-                <div>
-                    <h1>RFID Card Management</h1>
-                    <p>Elegant system for student card registration, cafeteria ordering, and balance management</p>
-                </div>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-id-card"></i>
             </div>
-        </header>
-
-        <!-- Stats Overview -->
-        <div class="stats-container" id="stats-container">
-            <!-- Stats will be loaded dynamically -->
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs-container">
-            <div class="nav-tab active" data-tab="register">
-                <i class="fas fa-user-plus"></i>
-                <span>Register Card</span>
-            </div>
-            <div class="nav-tab" data-tab="cafeteria">
-                <i class="fas fa-utensils"></i>
-                <span>Cafeteria</span>
-            </div>
-            <div class="nav-tab" data-tab="recharge">
-                <i class="fas fa-money-bill-wave"></i>
-                <span>Recharge</span>
-            </div>
-            <div class="nav-tab" data-tab="cards">
-                <i class="fas fa-list"></i>
-                <span>All Cards</span>
-            </div>
-        </div>
-
-        <!-- Register New Card Tab -->
-        <div id="register-tab" class="tab-content active">
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-id-card"></i> Register New Student Card</h2>
-                <p style="color: var(--gray); margin-bottom: 25px;">Enter student details and RFID card number to register a new card.</p>
-                
-                <div id="register-status" class="status-message"></div>
-                
-                <form id="register-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="student-name" class="required">Student Full Name</label>
-                            <input type="text" id="student-name" placeholder="Enter student's full name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="admission-no" class="required">Admission Number</label>
-                            <input type="text" id="admission-no" placeholder="e.g. ADM2023001" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="student-class" class="required">Class</label>
-                            <select id="student-class" required>
-                                <option value="">Select Class</option>
-                                <option value="1">Class 1</option>
-                                <option value="2">Class 2</option>
-                                <option value="3">Class 3</option>
-                                <option value="4">Class 4</option>
-                                <option value="5">Class 5</option>
-                                <option value="6">Class 6</option>
-                                <option value="7">Class 7</option>
-                                <option value="8">Class 8</option>
-                                <option value="9">Class 9</option>
-                                <option value="10">Class 10</option>
-                                <option value="11">Class 11</option>
-                                <option value="12">Class 12</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="student-section" class="required">Section</label>
-                            <select id="student-section" required>
-                                <option value="">Select Section</option>
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="D">D</option>
-                                <option value="E">E</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="student-house" class="required">House</label>
-                            <select id="student-house" required>
-                                <option value="">Select House</option>
-                                <option value="Red">Red House</option>
-                                <option value="Blue">Blue House</option>
-                                <option value="Green">Green House</option>
-                                <option value="Yellow">Yellow House</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="rfid-number" class="required">RFID Card Number</label>
-                            <div class="rfid-input-area">
-                                <i class="fas fa-credit-card"></i>
-                                <p>Enter RFID Card Number</p>
-                                <input type="text" id="rfid-number" placeholder="Type RFID number (e.g., 666356264)" required style="text-align: center; font-size: 1.2rem;">
-                                <div class="rfid-help-text">Enter the unique number from the RFID card</div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="initial-amount" class="required">Initial Amount to Load</label>
-                            <input type="number" id="initial-amount" min="100" step="0.01" placeholder="Enter initial amount" value="500.00" required>
-                            <p style="margin-top: 10px; color: var(--gray); font-size: 0.95rem;">Minimum amount: ₹100.00</p>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success" style="width: 100%; padding: 22px; font-size: 1.2rem;" id="register-btn">
-                        <i class="fas fa-save"></i> Register Student Card
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Cafeteria Ordering Tab -->
-        <div id="cafeteria-tab" class="tab-content">
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-utensils"></i> Cafeteria Ordering</h2>
-                <p style="color: var(--gray); margin-bottom: 25px;">Check card balance and place food orders from the cafeteria menu.</p>
-                
-                <div class="rfid-input-area">
-                    <i class="fas fa-search"></i>
-                    <p>Enter RFID Card Number</p>
-                    <input type="text" id="search-rfid" placeholder="Type RFID number to check balance" style="text-align: center; font-size: 1.2rem;">
-                    <div class="rfid-help-text">Enter the RFID number to check balance and place orders</div>
-                    <button id="check-balance-btn" class="btn" style="margin-top: 25px; padding: 20px 40px; width: 100%; font-size: 1.2rem;">
-                        <i class="fas fa-search"></i> Check Balance & Load Menu
+            <h1 class="login-title">RFID System</h1>
+            <p class="login-subtitle">Enter password to access the system</p>
+            
+            <form class="login-form" id="loginForm">
+                <div class="password-input-group">
+                    <input type="password" 
+                           class="password-input" 
+                           id="passwordInput" 
+                           placeholder="Enter password"
+                           autocomplete="off">
+                    <button type="button" class="password-toggle" id="passwordToggle">
+                        <i class="fas fa-eye"></i>
                     </button>
                 </div>
                 
-                <div id="balance-status" class="status-message"></div>
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
                 
-                <div id="balance-display" class="balance-display" style="display: none;">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Current Card Balance</h3>
-                    <div class="balance-amount">₹<span id="balance-amount">0.00</span></div>
-                    <p style="font-size: 1.1rem; margin-top: 15px;">Card Holder: <strong><span id="card-holder">-</span></strong></p>
-                    <p>Admission No: <span id="card-admission">-</span> | Class: <span id="card-class">-</span> | Section: <span id="card-section">-</span></p>
+                <div class="login-error" id="loginError">
+                    <i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.
+                </div>
+                
+                <div class="attempts-counter" id="attemptsCounter">
+                    Attempts remaining: <span id="attemptsLeft">3</span>
+                </div>
+                
+                <div class="login-hint">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>note:</strong> only admins are accessed to use this software
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Greeting Overlay -->
+    <div class="greeting-overlay" id="greetingOverlay">
+        <div class="greeting-content">
+            <div class="greeting-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="greeting-text">Welcome!</h2>
+            <p class="greeting-subtext">Successfully authenticated</p>
+            <div class="greeting-progress">
+                <div class="greeting-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (Hidden Initially) -->
+    <div class="main-app" id="mainApp">
+        <div class="app-container">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="sidebar-title">RFID System</div>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <button class="nav-tab active" data-tab="register">
+                            <i class="fas fa-user-plus"></i> Register Card
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-tab" data-tab="cafeteria">
+                            <i class="fas fa-utensils"></i> Cafeteria
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-tab" data-tab="recharge">
+                            <i class="fas fa-coins"></i> Recharge
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-tab" data-tab="cards">
+                            <i class="fas fa-list"></i> All Cards
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-tab" data-tab="transactions">
+                            <i class="fas fa-history"></i> Transactions
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="footer">
+                    <p>&copy; 2024 RFID System</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">Version 2.0</p>
                 </div>
             </div>
             
-            <div id="cafeteria-menu" class="card" style="display: none;">
-                <h2 class="card-title"><i class="fas fa-hamburger"></i> Cafeteria Menu</h2>
-                <p style="color: var(--gray); margin-bottom: 25px;">Select items from the menu. Amount will be deducted from card balance.</p>
-                
-                <div class="menu-grid" id="menu-items">
-                    <!-- Menu items will be loaded here dynamically -->
-                </div>
-                
-                <div class="order-summary">
-                    <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 25px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-receipt"></i> Order Summary</h3>
-                    <ul class="order-items" id="order-items">
-                        <!-- Order items will appear here -->
-                    </ul>
-                    <div class="total-amount">
-                        Total: ₹<span id="order-total">0.00</span>
-                    </div>
-                    
-                    <div id="order-status" class="status-message"></div>
-                    
-                    <div style="display: flex; gap: 20px; margin-top: 30px;">
-                        <button id="place-order-btn" class="btn btn-success" style="flex: 2; padding: 22px; font-size: 1.2rem;">
-                            <i class="fas fa-check-circle"></i> Place Order & Deduct Amount
-                        </button>
-                        <button id="clear-order-btn" class="btn" style="flex: 1; padding: 22px; font-size: 1.2rem;">
-                            <i class="fas fa-times"></i> Clear Order
+            <div class="main-content">
+                <header class="header">
+                    <h1 class="header-title">RFID Card Management System</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recharge Card Tab -->
-        <div id="recharge-tab" class="tab-content">
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-coins"></i> Recharge Card</h2>
-                <p style="color: var(--gray); margin-bottom: 25px;">Add money to an existing RFID card balance.</p>
+                </header>
                 
-                <div id="recharge-status" class="status-message"></div>
-                
-                <div class="rfid-input-area">
-                    <i class="fas fa-credit-card"></i>
-                    <p>Enter RFID Card Number</p>
-                    <input type="text" id="recharge-rfid" placeholder="Type RFID number to recharge" style="text-align: center; font-size: 1.2rem;">
-                    <div class="rfid-help-text">Enter the RFID number to add money to the card</div>
-                    <button id="check-recharge-btn" class="btn" style="margin-top: 25px; padding: 20px 40px; width: 100%; font-size: 1.2rem;">
-                        <i class="fas fa-search"></i> Check Card & Load Details
-                    </button>
-                </div>
-                
-                <div id="recharge-details" style="display: none;">
-                    <div class="balance-display" style="margin-top: 40px;">
-                        <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Current Card Balance</h3>
-                        <div class="balance-amount">₹<span id="recharge-balance">0.00</span></div>
-                        <p style="font-size: 1.1rem; margin-top: 15px;">Card Holder: <strong><span id="recharge-holder">-</span></strong></p>
-                        <p>Admission No: <span id="recharge-admission">-</span> | Class: <span id="recharge-class">-</span></p>
+                <!-- Register Card Tab -->
+                <div class="tab-content active" id="register-tab">
+                    <div class="card">
+                        <h2 class="card-title">Register New RFID Card</h2>
+                        <form id="register-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Student Name</label>
+                                    <input type="text" class="form-input" id="student-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Admission Number</label>
+                                    <input type="text" class="form-input" id="admission-no" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-input" id="student-class" required>
+                                        <option value="">Select Class</option>
+                                        <option value="1">Class 1</option>
+                                        <option value="2">Class 2</option>
+                                        <option value="3">Class 3</option>
+                                        <option value="4">Class 4</option>
+                                        <option value="5">Class 5</option>
+                                        <option value="6">Class 6</option>
+                                        <option value="7">Class 7</option>
+                                        <option value="8">Class 8</option>
+                                        <option value="9">Class 9</option>
+                                        <option value="10">Class 10</option>
+                                        <option value="11">Class 11</option>
+                                        <option value="12">Class 12</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Section</label>
+                                    <select class="form-input" id="student-section" required>
+                                        <option value="">Select Section</option>
+                                        <option value="A">Section A</option>
+                                        <option value="B">Section B</option>
+                                        <option value="C">Section C</option>
+                                        <option value="D">Section D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">House</label>
+                                    <select class="form-input" id="student-house" required>
+                                        <option value="">Select House</option>
+                                        <option value="Red">Red House</option>
+                                        <option value="Blue">Blue House</option>
+                                        <option value="Green">Green House</option>
+                                        <option value="Yellow">Yellow House</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">RFID Number</label>
+                                    <input type="text" class="form-input" id="rfid-number" placeholder="Tap RFID card" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Initial Amount (₹)</label>
+                                    <input type="number" class="form-input" id="initial-amount" min="100" step="10" value="500" required>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" id="register-btn">
+                                <i class="fas fa-save"></i> Register Card
+                            </button>
+                            
+                            <div class="status-message" id="register-status"></div>
+                        </form>
                     </div>
-                    
-                    <div class="recharge-form">
-                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 25px;">Select Recharge Amount</h3>
+                </div>
+                
+                <!-- Cafeteria Tab -->
+                <div class="tab-content" id="cafeteria-tab">
+                    <div class="card">
+                        <h2 class="card-title">Check Card Balance</h2>
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">RFID Number</label>
+                                <input type="text" class="form-input" id="search-rfid" placeholder="Tap RFID card or enter number">
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: flex-end;">
+                                <button class="btn btn-primary" id="check-balance-btn">
+                                    <i class="fas fa-search"></i> Check Balance
+                                </button>
+                            </div>
+                        </div>
                         
-                        <div class="recharge-amounts">
+                        <div class="status-message" id="balance-status"></div>
+                        
+                        <div class="balance-display" id="balance-display">
+                            <div>Current Balance</div>
+                            <div class="balance-amount" id="balance-amount">₹0.00</div>
+                            <div class="card-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Card Holder</div>
+                                    <div class="detail-value" id="card-holder">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Admission No.</div>
+                                    <div class="detail-value" id="card-admission">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Class</div>
+                                    <div class="detail-value" id="card-class">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Section</div>
+                                    <div class="detail-value" id="card-section">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">House</div>
+                                    <div class="detail-value" id="card-house">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" id="cafeteria-menu" style="display: none;">
+                        <h2 class="card-title">Cafeteria Menu</h2>
+                        <div class="menu-grid" id="menu-items">
+                            <!-- Menu items will be loaded here -->
+                        </div>
+                        
+                        <div class="order-summary">
+                            <h3>Order Summary</h3>
+                            <ul class="order-items" id="order-items">
+                                <li style="text-align: center; color: #7f8c8d;">No items added to order yet.</li>
+                            </ul>
+                            <div class="order-total">
+                                <span>Total:</span>
+                                <span>₹<span id="order-total">0.00</span></span>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="btn btn-primary" id="place-order-btn" style="flex: 1;">
+                                    <i class="fas fa-shopping-cart"></i> Place Order
+                                </button>
+                                <button class="btn btn-secondary" id="clear-order-btn">
+                                    <i class="fas fa-trash"></i> Clear
+                                </button>
+                            </div>
+                            <div class="status-message" id="order-status"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recharge Tab -->
+                <div class="tab-content" id="recharge-tab">
+                    <div class="card">
+                        <h2 class="card-title">Recharge RFID Card</h2>
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">RFID Number</label>
+                                <input type="text" class="form-input" id="recharge-rfid" placeholder="Tap RFID card or enter number">
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: flex-end;">
+                                <button class="btn btn-primary" id="check-recharge-btn">
+                                    <i class="fas fa-search"></i> Check Card
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="status-message" id="recharge-status"></div>
+                        
+                        <div class="balance-display" id="recharge-details" style="display: none;">
+                            <div>Current Balance</div>
+                            <div class="balance-amount" id="recharge-balance">₹0.00</div>
+                            <div class="card-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Card Holder</div>
+                                    <div class="detail-value" id="recharge-holder">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Admission No.</div>
+                                    <div class="detail-value" id="recharge-admission">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Class</div>
+                                    <div class="detail-value" id="recharge-class">-</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Section</div>
+                                    <div class="detail-value" id="recharge-section">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" id="recharge-options" style="display: none;">
+                        <h2 class="card-title">Select Recharge Amount</h2>
+                        <div class="amount-options">
+                            <div class="amount-option" data-amount="50">₹50</div>
                             <div class="amount-option" data-amount="100">₹100</div>
                             <div class="amount-option" data-amount="200">₹200</div>
                             <div class="amount-option" data-amount="500">₹500</div>
                             <div class="amount-option" data-amount="1000">₹1000</div>
-                            <div class="amount-option" data-amount="2000">₹2000</div>
-                        </div>
-                        
-                        <div class="form-group" style="margin-top: 35px;">
-                            <label for="custom-amount">Or Enter Custom Amount</label>
-                            <input type="number" id="custom-amount" min="50" step="50" placeholder="Enter custom amount (min ₹50)">
                         </div>
                         
                         <div class="form-group">
-                            <label for="recharge-notes">Notes (Optional)</label>
-                            <textarea id="recharge-notes" rows="3" placeholder="Add any notes about this recharge..."></textarea>
+                            <label class="form-label">Or Enter Custom Amount</label>
+                            <input type="number" class="form-input" id="custom-amount" min="50" step="10" placeholder="Enter amount (min ₹50)">
                         </div>
                         
-                        <div style="display: flex; gap: 20px; margin-top: 35px;">
-                            <button id="process-recharge-btn" class="btn btn-warning" style="flex: 2; padding: 22px; font-size: 1.2rem;">
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <input type="text" class="form-input" id="recharge-notes" placeholder="Enter notes for this recharge">
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" id="process-recharge-btn" style="flex: 1;">
                                 <i class="fas fa-coins"></i> Process Recharge
                             </button>
-                            <button id="cancel-recharge-btn" class="btn" style="flex: 1; padding: 22px; font-size: 1.2rem;">
+                            <button class="btn btn-secondary" id="cancel-recharge-btn">
                                 <i class="fas fa-times"></i> Cancel
                             </button>
                         </div>
                     </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title">Recent Recharges</h2>
+                        <div id="recent-recharges">
+                            <p>No recharge history available. Recharges will appear here.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-history"></i> Recent Recharges</h2>
-                <div id="recent-recharges">
-                    <p style="color: var(--gray); text-align: center; padding: 40px;">Loading recharge history...</p>
+                
+                <!-- All Cards Tab -->
+                <div class="tab-content" id="cards-tab">
+                    <div class="card">
+                        <h2 class="card-title">All Registered Cards</h2>
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <input type="text" class="form-input" id="search-cards" placeholder="Search by name, admission no., or RFID...">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-secondary" id="refresh-cards-btn">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                                <button class="btn btn-secondary" id="export-cards-btn">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Admission No.</th>
+                                        <th>RFID Number</th>
+                                        <th>Class</th>
+                                        <th>House</th>
+                                        <th>Balance</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cards-table-body">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 40px; color: #6c757d;">
+                                            Loading cards...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="margin-top: 15px; color: #7f8c8d;">
+                            Total Cards: <strong id="cards-count">0</strong>
+                        </div>
+                        
+                        <div class="status-message" id="cards-status"></div>
+                    </div>
+                </div>
+                
+                <!-- Transactions Tab -->
+                <div class="tab-content" id="transactions-tab">
+                    <div class="card">
+                        <h2 class="card-title">Transaction History</h2>
+                        <div id="transactions-container">
+                            <p>Loading transactions...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- View All Cards Tab -->
-        <div id="cards-tab" class="tab-content">
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-list"></i> All Registered Cards</h2>
-                <p style="color: var(--gray); margin-bottom: 25px;">View and manage all registered student cards in the system.</p>
-                
-                <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 300px;">
-                        <input type="text" id="search-cards" placeholder="Search by name, admission no, or RFID..." style="width: 100%; padding: 18px 25px; font-size: 1.1rem;">
-                    </div>
-                    <div>
-                        <button id="refresh-cards-btn" class="btn" style="padding: 18px 35px;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                    <div>
-                        <button id="export-cards-btn" class="btn" style="padding: 18px 35px;">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="cards-status" class="status-message"></div>
-                
-                <div class="data-table-container">
-                    <table class="data-table" id="cards-table">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Admission No</th>
-                                <th>RFID Number</th>
-                                <th>Class & Section</th>
-                                <th>House</th>
-                                <th>Balance</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cards-table-body">
-                            <!-- Cards will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
-                    <div style="font-size: 1.1rem; color: var(--gray);">
-                        <span id="cards-count">0</span> cards registered
-                    </div>
-                    <div style="display: flex; gap: 15px;">
-                        <button id="prev-page-btn" class="btn" style="padding: 12px 25px;" disabled>
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </button>
-                        <button id="next-page-btn" class="btn" style="padding: 12px 25px;" disabled>
-                            Next <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p style="font-size: 1rem; margin-bottom: 10px;">RFID Card Management System &copy; 2023</p>
-            <p style="font-size: 0.9rem; color: var(--gray-light);">Powered by Firebase | Elegant & Playful UI Design</p>
-        </footer>
     </div>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDAaMl2Oo5uuXL3ORdsllA-Kf2FblqNe1c",
-            authDomain: "rfid-payment-system-62fc8.firebaseapp.com",
-            projectId: "rfid-payment-system-62fc8",
-            storageBucket: "rfid-payment-system-62fc8.firebasestorage.app",
-            messagingSenderId: "270225297592",
-            appId: "1:270225297592:web:0787a51833a5947edb644d",
-            measurementId: "G-NE0XH03HE8"
-        };
-
-        // Initialize Firebase
-        let db, cardsCollection, transactionsCollection, menuCollection;
-        let isFirebaseConnected = false;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            cardsCollection = db.collection('cards');
-            transactionsCollection = db.collection('transactions');
-            menuCollection = db.collection('menu');
-            isFirebaseConnected = true;
+        // ==================== LOGIN SYSTEM ====================
+        
+        // Password for the system (in production, this should be server-side)
+        const SYSTEM_PASSWORD = 'admin123';
+        let loginAttempts = 0;
+        const MAX_ATTEMPTS = 3;
+        
+        // DOM elements for login
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const attemptsCounter = document.getElementById('attemptsCounter');
+        const attemptsLeft = document.getElementById('attemptsLeft');
+        const mainApp = document.getElementById('mainApp');
+        const greetingOverlay = document.getElementById('greetingOverlay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Toggle password visibility
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
             
-            // Update connection status
-            const firebaseStatus = document.getElementById('firebase-status');
-            firebaseStatus.innerHTML = '<i class="fas fa-check-circle"></i><span>Connected to Firebase</span>';
-            firebaseStatus.style.background = 'linear-gradient(135deg, var(--success), var(--accent))';
+            // Toggle icon
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
+        // Handle login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            console.log('Firebase connected successfully!');
-        } catch (error) {
-            console.error('Firebase initialization error:', error);
-            const firebaseStatus = document.getElementById('firebase-status');
-            firebaseStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Firebase Connection Failed</span>';
+            const enteredPassword = passwordInput.value;
+            
+            // Check password
+            if (enteredPassword === SYSTEM_PASSWORD) {
+                // Successful login
+                loginError.style.display = 'none';
+                loginBtn.innerHTML = '<div class="loading-spinner"></div> Authenticating...';
+                loginBtn.disabled = true;
+                
+                // Show greeting overlay
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    greetingOverlay.classList.add('show');
+                    
+                    // Play success sound (if needed)
+                    playSound('success');
+                    
+                    // After greeting, show main app
+                    setTimeout(() => {
+                        greetingOverlay.classList.remove('show');
+                        mainApp.style.display = 'block';
+                        
+                        // Initialize the main application
+                        initializeMainApp();
+                    }, 2000);
+                }, 500);
+                
+            } else {
+                // Failed login
+                loginAttempts++;
+                
+                // Show error message
+                loginError.style.display = 'block';
+                loginError.style.animation = 'shake 0.5s ease-in-out';
+                
+                // Update attempts counter
+                attemptsLeft.textContent = MAX_ATTEMPTS - loginAttempts;
+                attemptsCounter.style.display = 'block';
+                
+                // Clear password field
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                // Play error sound
+                playSound('error');
+                
+                // Check if max attempts reached
+                if (loginAttempts >= MAX_ATTEMPTS) {
+                    // Disable login form
+                    loginBtn.disabled = true;
+                    passwordInput.disabled = true;
+                    loginError.innerHTML = '<i class="fas fa-lock"></i> Maximum attempts reached. Please refresh the page to try again.';
+                    loginError.style.background = 'rgba(231, 76, 60, 0.2)';
+                    loginError.style.color = '#c0392b';
+                    loginError.style.fontWeight = '600';
+                }
+                
+                // Reset animation
+                setTimeout(() => {
+                    loginError.style.animation = '';
+                }, 500);
+            }
+        });
+        
+        // Handle logout
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Reset login state
+                loginAttempts = 0;
+                loginBtn.disabled = false;
+                passwordInput.disabled = false;
+                passwordInput.value = '';
+                loginError.style.display = 'none';
+                attemptsCounter.style.display = 'none';
+                loginError.innerHTML = '<i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.';
+                loginError.style.background = 'rgba(231, 76, 60, 0.1)';
+                loginError.style.color = '#e74c3c';
+                loginError.style.fontWeight = '400';
+                
+                // Hide main app and show login screen
+                mainApp.style.display = 'none';
+                loginScreen.style.display = 'flex';
+                
+                // Focus on password input
+                passwordInput.focus();
+            }
+        });
+        
+        // Play sound effect (optional)
+        function playSound(type) {
+            // Create audio context for sound effects
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            if (type === 'success') {
+                // Success sound: ascending tones
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            } else if (type === 'error') {
+                // Error sound: descending tone
+                oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            }
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
         }
-
-        // ==================== APPLICATION STATE ====================
-        let currentOrder = [];
-        let currentCard = null;
-        let rechargeCard = null;
+        
+        // Focus on password input when page loads
+        window.addEventListener('load', function() {
+            passwordInput.focus();
+        });
+        
+        // ==================== MAIN APPLICATION ====================
+        
+        // Firebase configuration (using public demo config for demonstration)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForDemo",
+            authDomain: "rfid-system-demo.firebaseapp.com",
+            projectId: "rfid-system-demo",
+            storageBucket: "rfid-system-demo.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+        
+        // Initialize Firebase (if available)
+        let isFirebaseConnected = false;
+        let db = null;
+        
+        try {
+            // Check if Firebase is available
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                isFirebaseConnected = true;
+                console.log('Firebase connected successfully');
+            } else {
+                console.log('Firebase not available - running in offline mode');
+            }
+        } catch (error) {
+            console.log('Firebase initialization failed - running in offline mode:', error);
+        }
+        
+        // Global variables
         let allCards = [];
         let allTransactions = [];
         let menuItems = [];
-        let currentPage = 1;
-        const cardsPerPage = 10;
-
-        // ==================== DOM ELEMENTS ====================
+        let currentCard = null;
+        let rechargeCard = null;
+        let currentOrder = [];
+        
+        // DOM elements for main app
         const navTabs = document.querySelectorAll('.nav-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
         const registerForm = document.getElementById('register-form');
         const searchRfidInput = document.getElementById('search-rfid');
         const checkBalanceBtn = document.getElementById('check-balance-btn');
@@ -1311,88 +1358,684 @@
         const rechargeRfidInput = document.getElementById('recharge-rfid');
         const checkRechargeBtn = document.getElementById('check-recharge-btn');
         const rechargeDetails = document.getElementById('recharge-details');
+        const rechargeOptions = document.getElementById('recharge-options');
         const amountOptions = document.querySelectorAll('.amount-option');
         const customAmountInput = document.getElementById('custom-amount');
         const processRechargeBtn = document.getElementById('process-recharge-btn');
         const cancelRechargeBtn = document.getElementById('cancel-recharge-btn');
         const searchCardsInput = document.getElementById('search-cards');
         const refreshCardsBtn = document.getElementById('refresh-cards-btn');
+        const exportCardsBtn = document.getElementById('export-cards-btn');
         const cardsTableBody = document.getElementById('cards-table-body');
         const cardsCount = document.getElementById('cards-count');
-        const exportCardsBtn = document.getElementById('export-cards-btn');
-        const prevPageBtn = document.getElementById('prev-page-btn');
-        const nextPageBtn = document.getElementById('next-page-btn');
-        const statsContainer = document.getElementById('stats-container');
-
-        // ==================== FIREBASE FUNCTIONS ====================
         
-        async function loadCardsFromFirebase() {
-            if (!isFirebaseConnected) return [];
+        // Initialize main application
+        function initializeMainApp() {
+            // Set up event listeners
+            setupEventListeners();
             
-            try {
-                const snapshot = await cardsCollection.get();
-                const cards = [];
-                snapshot.forEach(doc => {
-                    cards.push({ id: doc.id, ...doc.data() });
+            // Load initial data
+            loadInitialData();
+            
+            console.log('Main application initialized successfully!');
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab navigation
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', async () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Clear any status messages when switching tabs
+                    clearStatusMessages();
+                    
+                    // Load data for specific tabs
+                    if (tabId === 'cards') {
+                        await updateCardsTable();
+                    }
+                    
+                    if (tabId === 'recharge') {
+                        await updateRechargeHistory();
+                    }
+                    
+                    if (tabId === 'transactions') {
+                        await loadTransactions();
+                    }
+                    
+                    if (tabId === 'cafeteria') {
+                        // Load menu if not already loaded
+                        if (menuItems.length === 0) {
+                            menuItems = getDefaultMenuItems();
+                        }
+                    }
                 });
-                return cards;
+            });
+            
+            // Simulate RFID card tap for registration
+            document.getElementById('rfid-number').addEventListener('click', function() {
+                const randomRFID = `666${Math.floor(100000 + Math.random() * 900000)}`;
+                this.value = randomRFID;
+                showStatus('RFID card tapped successfully! Card number: ' + randomRFID, 'success', 'register-status');
+            });
+            
+            // Simulate RFID card tap for cafeteria
+            searchRfidInput.addEventListener('click', async function() {
+                allCards = await loadCardsFromFirebase();
+                
+                if (allCards.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * allCards.length);
+                    const randomRFID = allCards[randomIndex].rfid;
+                    this.value = randomRFID;
+                    showStatus('RFID card tapped successfully!', 'success', 'balance-status');
+                } else {
+                    showStatus('No cards in database. Please register a card first.', 'error', 'balance-status');
+                }
+            });
+            
+            // Simulate RFID card tap for recharge
+            rechargeRfidInput.addEventListener('click', async function() {
+                allCards = await loadCardsFromFirebase();
+                
+                if (allCards.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * allCards.length);
+                    const randomRFID = allCards[randomIndex].rfid;
+                    this.value = randomRFID;
+                    showStatus('RFID card tapped successfully!', 'success', 'recharge-status');
+                } else {
+                    showStatus('No cards in database. Please register a card first.', 'error', 'recharge-status');
+                }
+            });
+            
+            // Register new RFID card
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('student-name').value;
+                const admissionNo = document.getElementById('admission-no').value;
+                const studentClass = document.getElementById('student-class').value;
+                const studentSection = document.getElementById('student-section').value;
+                const studentHouse = document.getElementById('student-house').value;
+                const rfidNumber = document.getElementById('rfid-number').value;
+                const amount = parseFloat(document.getElementById('initial-amount').value);
+                
+                if (amount < 100) {
+                    showStatus('Minimum initial amount is ₹100.', 'error', 'register-status');
+                    return;
+                }
+                
+                const registerBtn = document.getElementById('register-btn');
+                const originalText = registerBtn.innerHTML;
+                registerBtn.innerHTML = '<div class="loading-spinner"></div> Registering...';
+                registerBtn.disabled = true;
+                
+                try {
+                    const cardData = {
+                        name: name,
+                        admissionNo: admissionNo,
+                        class: studentClass,
+                        section: studentSection,
+                        house: studentHouse,
+                        rfid: rfidNumber,
+                        balance: amount,
+                        status: "active"
+                    };
+                    
+                    if (isFirebaseConnected) {
+                        await registerCardToFirebase(cardData);
+                    } else {
+                        // Store in local storage for demo
+                        let cards = JSON.parse(localStorage.getItem('cards') || '[]');
+                        cards.push({...cardData, id: Date.now().toString()});
+                        localStorage.setItem('cards', JSON.stringify(cards));
+                    }
+                    
+                    showStatus(`RFID card successfully registered for ${name} (${admissionNo}) with initial balance of ₹${amount.toFixed(2)}`, 'success', 'register-status');
+                    
+                    registerForm.reset();
+                    allCards = await loadCardsFromFirebase();
+                    
+                    if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
+                        await updateCardsTable();
+                    }
+                    
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error', 'register-status');
+                } finally {
+                    registerBtn.innerHTML = originalText;
+                    registerBtn.disabled = false;
+                }
+            });
+            
+            // Check balance for a card (Cafeteria)
+            checkBalanceBtn.addEventListener('click', async function() {
+                const rfidNumber = searchRfidInput.value.trim();
+                
+                if (!rfidNumber) {
+                    showStatus('Please tap an RFID card first or enter the card number manually.', 'error', 'balance-status');
+                    return;
+                }
+                
+                const checkBalanceBtn = document.getElementById('check-balance-btn');
+                const originalText = checkBalanceBtn.innerHTML;
+                checkBalanceBtn.innerHTML = '<div class="loading-spinner"></div> Checking...';
+                checkBalanceBtn.disabled = true;
+                
+                try {
+                    const card = await findCardByRFID(rfidNumber);
+                    
+                    if (!card) {
+                        showStatus('RFID card not found. Please register this card first.', 'error', 'balance-status');
+                        balanceDisplay.style.display = 'none';
+                        cafeteriaMenu.style.display = 'none';
+                        return;
+                    }
+                    
+                    document.getElementById('balance-amount').textContent = card.balance.toFixed(2);
+                    document.getElementById('card-holder').textContent = card.name;
+                    document.getElementById('card-admission').textContent = card.admissionNo;
+                    document.getElementById('card-class').textContent = card.class;
+                    document.getElementById('card-section').textContent = card.section;
+                    document.getElementById('card-house').textContent = card.house;
+                    balanceDisplay.style.display = 'block';
+                    
+                    currentCard = card;
+                    cafeteriaMenu.style.display = 'block';
+                    
+                    if (menuItems.length === 0) {
+                        menuItems = getDefaultMenuItems();
+                    }
+                    
+                    loadMenuItems();
+                    currentOrder = [];
+                    updateOrderSummary();
+                    
+                    showStatus(`Card loaded successfully for ${card.name}. Balance: ₹${card.balance.toFixed(2)}`, 'success', 'balance-status');
+                    
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error', 'balance-status');
+                } finally {
+                    checkBalanceBtn.innerHTML = originalText;
+                    checkBalanceBtn.disabled = false;
+                }
+            });
+            
+            // Check card for recharge
+            checkRechargeBtn.addEventListener('click', async function() {
+                const rfidNumber = rechargeRfidInput.value.trim();
+                
+                if (!rfidNumber) {
+                    showStatus('Please tap an RFID card first or enter the card number manually.', 'error', 'recharge-status');
+                    return;
+                }
+                
+                const checkRechargeBtn = document.getElementById('check-recharge-btn');
+                const originalText = checkRechargeBtn.innerHTML;
+                checkRechargeBtn.innerHTML = '<div class="loading-spinner"></div> Checking...';
+                checkRechargeBtn.disabled = true;
+                
+                try {
+                    const card = await findCardByRFID(rfidNumber);
+                    
+                    if (!card) {
+                        showStatus('RFID card not found. Please register this card first.', 'error', 'recharge-status');
+                        rechargeDetails.style.display = 'none';
+                        return;
+                    }
+                    
+                    document.getElementById('recharge-balance').textContent = card.balance.toFixed(2);
+                    document.getElementById('recharge-holder').textContent = card.name;
+                    document.getElementById('recharge-admission').textContent = card.admissionNo;
+                    document.getElementById('recharge-class').textContent = card.class;
+                    document.getElementById('recharge-section').textContent = card.section;
+                    rechargeDetails.style.display = 'block';
+                    
+                    rechargeCard = card;
+                    rechargeOptions.style.display = 'block';
+                    
+                    amountOptions.forEach(option => option.classList.remove('selected'));
+                    customAmountInput.value = '';
+                    
+                    showStatus(`Card loaded successfully for ${card.name}. Current balance: ₹${card.balance.toFixed(2)}`, 'success', 'recharge-status');
+                    
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error', 'recharge-status');
+                } finally {
+                    checkRechargeBtn.innerHTML = originalText;
+                    checkRechargeBtn.disabled = false;
+                }
+            });
+            
+            // Amount option selection
+            amountOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    customAmountInput.value = '';
+                });
+            });
+            
+            // Custom amount input
+            customAmountInput.addEventListener('input', function() {
+                amountOptions.forEach(opt => opt.classList.remove('selected'));
+            });
+            
+            // Process recharge
+            processRechargeBtn.addEventListener('click', async function() {
+                if (!rechargeCard) {
+                    showStatus('Please load a card first.', 'error', 'recharge-status');
+                    return;
+                }
+                
+                let rechargeAmount = 0;
+                
+                if (customAmountInput.value.trim()) {
+                    rechargeAmount = parseFloat(customAmountInput.value);
+                } else {
+                    const selectedOption = document.querySelector('.amount-option.selected');
+                    if (selectedOption) {
+                        rechargeAmount = parseFloat(selectedOption.getAttribute('data-amount'));
+                    }
+                }
+                
+                if (rechargeAmount <= 0 || isNaN(rechargeAmount)) {
+                    showStatus('Please select or enter a valid recharge amount.', 'error', 'recharge-status');
+                    return;
+                }
+                
+                if (rechargeAmount < 50) {
+                    showStatus('Minimum recharge amount is ₹50.', 'error', 'recharge-status');
+                    return;
+                }
+                
+                const notes = document.getElementById('recharge-notes').value.trim();
+                
+                const processBtn = document.getElementById('process-recharge-btn');
+                const originalText = processBtn.innerHTML;
+                processBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                processBtn.disabled = true;
+                
+                try {
+                    const newBalance = rechargeCard.balance + rechargeAmount;
+                    
+                    if (isFirebaseConnected) {
+                        await updateCardBalance(rechargeCard.id, newBalance, {
+                            cardId: rechargeCard.id,
+                            rfid: rechargeCard.rfid,
+                            type: 'recharge',
+                            amount: rechargeAmount,
+                            previousBalance: rechargeCard.balance,
+                            newBalance: newBalance,
+                            description: notes || 'Card recharge'
+                        });
+                    } else {
+                        // Update in local storage for demo
+                        let cards = JSON.parse(localStorage.getItem('cards') || '[]');
+                        const cardIndex = cards.findIndex(c => c.rfid === rechargeCard.rfid);
+                        if (cardIndex !== -1) {
+                            cards[cardIndex].balance = newBalance;
+                            localStorage.setItem('cards', JSON.stringify(cards));
+                        }
+                    }
+                    
+                    rechargeCard.balance = newBalance;
+                    document.getElementById('recharge-balance').textContent = rechargeCard.balance.toFixed(2);
+                    
+                    showStatus(`Successfully recharged ₹${rechargeAmount.toFixed(2)} to ${rechargeCard.name}'s card. New balance: ₹${rechargeCard.balance.toFixed(2)}`, 'success', 'recharge-status');
+                    
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    customAmountInput.value = '';
+                    document.getElementById('recharge-notes').value = '';
+                    
+                    await updateRechargeHistory();
+                    allCards = await loadCardsFromFirebase();
+                    
+                    if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
+                        await updateCardsTable();
+                    }
+                    
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error', 'recharge-status');
+                } finally {
+                    processBtn.innerHTML = originalText;
+                    processBtn.disabled = false;
+                }
+            });
+            
+            // Cancel recharge
+            cancelRechargeBtn.addEventListener('click', function() {
+                rechargeDetails.style.display = 'none';
+                rechargeOptions.style.display = 'none';
+                rechargeRfidInput.value = '';
+                rechargeCard = null;
+                showStatus('Recharge cancelled.', 'info', 'recharge-status');
+            });
+            
+            // Place order and deduct amount (Cafeteria)
+            placeOrderBtn.addEventListener('click', async function() {
+                if (!currentCard) {
+                    showStatus('No card selected. Please check balance first.', 'error', 'order-status');
+                    return;
+                }
+                
+                if (currentOrder.length === 0) {
+                    showStatus('Please select at least one item from the menu.', 'error', 'order-status');
+                    return;
+                }
+                
+                const orderTotal = currentOrder.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                
+                if (orderTotal > currentCard.balance) {
+                    showStatus(`Insufficient balance. Order total: ₹${orderTotal.toFixed(2)}, Available balance: ₹${currentCard.balance.toFixed(2)}`, 'error', 'order-status');
+                    return;
+                }
+                
+                const placeOrderBtn = document.getElementById('place-order-btn');
+                const originalText = placeOrderBtn.innerHTML;
+                placeOrderBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+                placeOrderBtn.disabled = true;
+                
+                try {
+                    const newBalance = currentCard.balance - orderTotal;
+                    
+                    const orderDescription = currentOrder.map(item => 
+                        `${item.quantity}x ${item.name} (₹${item.price})`
+                    ).join(', ');
+                    
+                    if (isFirebaseConnected) {
+                        await updateCardBalance(currentCard.id, newBalance, {
+                            cardId: currentCard.id,
+                            rfid: currentCard.rfid,
+                            type: 'purchase',
+                            amount: -orderTotal,
+                            previousBalance: currentCard.balance,
+                            newBalance: newBalance,
+                            description: `Cafeteria purchase: ${orderDescription}`
+                        });
+                    } else {
+                        // Update in local storage for demo
+                        let cards = JSON.parse(localStorage.getItem('cards') || '[]');
+                        const cardIndex = cards.findIndex(c => c.rfid === currentCard.rfid);
+                        if (cardIndex !== -1) {
+                            cards[cardIndex].balance = newBalance;
+                            localStorage.setItem('cards', JSON.stringify(cards));
+                        }
+                    }
+                    
+                    currentCard.balance = newBalance;
+                    document.getElementById('balance-amount').textContent = currentCard.balance.toFixed(2);
+                    
+                    showStatus(`Order placed successfully! ₹${orderTotal.toFixed(2)} deducted from your card. New balance: ₹${currentCard.balance.toFixed(2)}`, 'success', 'order-status');
+                    
+                    currentOrder = [];
+                    updateOrderSummary();
+                    
+                    document.querySelectorAll('.menu-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    allCards = await loadCardsFromFirebase();
+                    
+                    if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
+                        await updateCardsTable();
+                    }
+                    
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error', 'order-status');
+                } finally {
+                    placeOrderBtn.innerHTML = originalText;
+                    placeOrderBtn.disabled = false;
+                }
+            });
+            
+            // Clear current order
+            clearOrderBtn.addEventListener('click', function() {
+                currentOrder = [];
+                updateOrderSummary();
+                
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                showStatus('Order cleared.', 'success', 'order-status');
+            });
+            
+            // Search cards
+            searchCardsInput.addEventListener('input', function() {
+                updateCardsTable();
+            });
+            
+            // Refresh cards table
+            refreshCardsBtn.addEventListener('click', async function() {
+                await updateCardsTable();
+                showStatus('Cards list refreshed.', 'success', 'cards-status');
+            });
+            
+            // Export cards data
+            exportCardsBtn.addEventListener('click', function() {
+                exportToCSV();
+            });
+        }
+        
+        // Load initial data
+        async function loadInitialData() {
+            try {
+                allCards = await loadCardsFromFirebase();
+                menuItems = await loadMenuFromFirebase();
+                allTransactions = await loadTransactionsFromFirebase();
+                
+                if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
+                    await updateCardsTable();
+                }
+                
+                if (document.querySelector('[data-tab="transactions"]').classList.contains('active')) {
+                    await loadTransactions();
+                }
+                
+                console.log('Initial data loaded successfully');
             } catch (error) {
-                console.error('Error loading cards:', error);
-                showStatus('Error loading cards from Firebase', 'error', 'cards-status');
-                return [];
+                console.error('Error loading initial data:', error);
             }
+        }
+        
+        // Firebase functions (simplified for demo)
+        async function loadCardsFromFirebase() {
+            if (isFirebaseConnected) {
+                try {
+                    const snapshot = await db.collection('cards').get();
+                    const cards = [];
+                    snapshot.forEach(doc => {
+                        cards.push({ id: doc.id, ...doc.data() });
+                    });
+                    return cards;
+                } catch (error) {
+                    console.error('Error loading cards from Firebase:', error);
+                }
+            }
+            
+            // Fallback to local storage
+            return JSON.parse(localStorage.getItem('cards') || '[]');
         }
         
         async function loadTransactionsFromFirebase() {
-            if (!isFirebaseConnected) return [];
-            
-            try {
-                const snapshot = await transactionsCollection.orderBy('timestamp', 'desc').limit(50).get();
-                const transactions = [];
-                snapshot.forEach(doc => {
-                    transactions.push({ id: doc.id, ...doc.data() });
-                });
-                return transactions;
-            } catch (error) {
-                console.error('Error loading transactions:', error);
-                return [];
+            if (isFirebaseConnected) {
+                try {
+                    const snapshot = await db.collection('transactions').get();
+                    const transactions = [];
+                    snapshot.forEach(doc => {
+                        transactions.push({ id: doc.id, ...doc.data() });
+                    });
+                    return transactions;
+                } catch (error) {
+                    console.error('Error loading transactions from Firebase:', error);
+                }
             }
+            
+            // Fallback to local storage
+            return JSON.parse(localStorage.getItem('transactions') || '[]');
         }
         
         async function loadMenuFromFirebase() {
-            if (!isFirebaseConnected) return getDefaultMenuItems();
-            
-            try {
-                const snapshot = await menuCollection.get();
-                const menu = [];
-                snapshot.forEach(doc => {
-                    menu.push({ id: doc.id, ...doc.data() });
-                });
-                
-                if (menu.length === 0) {
-                    await addDefaultMenuItems();
-                    return getDefaultMenuItems();
-                }
-                
-                return menu;
-            } catch (error) {
-                console.error('Error loading menu:', error);
-                return getDefaultMenuItems();
-            }
-        }
-        
-        async function addDefaultMenuItems() {
-            const defaultMenu = getDefaultMenuItems();
-            
-            for (const item of defaultMenu) {
+            if (isFirebaseConnected) {
                 try {
-                    await menuCollection.add(item);
+                    const snapshot = await db.collection('menu').get();
+                    const menu = [];
+                    snapshot.forEach(doc => {
+                        menu.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    if (menu.length === 0) {
+                        return getDefaultMenuItems();
+                    }
+                    
+                    return menu;
                 } catch (error) {
-                    console.error('Error adding menu item:', error);
+                    console.error('Error loading menu from Firebase:', error);
                 }
             }
+            
+            // Fallback to default menu
+            return getDefaultMenuItems();
         }
         
+        async function registerCardToFirebase(cardData) {
+            if (isFirebaseConnected) {
+                try {
+                    // Check if RFID already exists
+                    const existingCardQuery = await db.collection('cards').where('rfid', '==', cardData.rfid).get();
+                    if (!existingCardQuery.empty) {
+                        throw new Error('RFID card already registered');
+                    }
+                    
+                    // Check if admission number already exists
+                    const existingAdmissionQuery = await db.collection('cards').where('admissionNo', '==', cardData.admissionNo).get();
+                    if (!existingAdmissionQuery.empty) {
+                        throw new Error('Admission number already registered');
+                    }
+                    
+                    // Add card to Firestore
+                    const docRef = await db.collection('cards').add({
+                        ...cardData,
+                        status: 'active',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Add initial transaction
+                    await db.collection('transactions').add({
+                        cardId: docRef.id,
+                        rfid: cardData.rfid,
+                        type: 'registration',
+                        amount: cardData.balance,
+                        previousBalance: 0,
+                        newBalance: cardData.balance,
+                        description: 'Initial card registration',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    return docRef.id;
+                } catch (error) {
+                    console.error('Error registering card to Firebase:', error);
+                    throw error;
+                }
+            }
+            
+            // Fallback to local storage
+            let cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            cards.push({...cardData, id: Date.now().toString()});
+            localStorage.setItem('cards', JSON.stringify(cards));
+            
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions.push({
+                id: Date.now().toString(),
+                cardId: Date.now().toString(),
+                rfid: cardData.rfid,
+                type: 'registration',
+                amount: cardData.balance,
+                previousBalance: 0,
+                newBalance: cardData.balance,
+                description: 'Initial card registration',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            return Date.now().toString();
+        }
+        
+        async function updateCardBalance(cardId, newBalance, transactionData) {
+            if (isFirebaseConnected) {
+                try {
+                    // Update card balance
+                    await db.collection('cards').doc(cardId).update({
+                        balance: newBalance,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Add transaction record
+                    await db.collection('transactions').add({
+                        ...transactionData,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error updating card balance in Firebase:', error);
+                    throw error;
+                }
+            }
+            
+            // Fallback to local storage
+            let cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            const cardIndex = cards.findIndex(c => c.id === cardId);
+            if (cardIndex !== -1) {
+                cards[cardIndex].balance = newBalance;
+                localStorage.setItem('cards', JSON.stringify(cards));
+            }
+            
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions.push({
+                ...transactionData,
+                id: Date.now().toString(),
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            return true;
+        }
+        
+        async function findCardByRFID(rfid) {
+            if (isFirebaseConnected) {
+                try {
+                    const querySnapshot = await db.collection('cards').where('rfid', '==', rfid).get();
+                    
+                    if (querySnapshot.empty) {
+                        return null;
+                    }
+                    
+                    const doc = querySnapshot.docs[0];
+                    return { id: doc.id, ...doc.data() };
+                } catch (error) {
+                    console.error('Error finding card in Firebase:', error);
+                }
+            }
+            
+            // Fallback to local storage
+            const cards = JSON.parse(localStorage.getItem('cards') || '[]');
+            return cards.find(card => card.rfid === rfid) || null;
+        }
+        
+        // Helper functions
         function getDefaultMenuItems() {
             return [
                 { 
@@ -1454,559 +2097,6 @@
             ];
         }
         
-        async function registerCardToFirebase(cardData) {
-            if (!isFirebaseConnected) throw new Error('Firebase not connected');
-            
-            try {
-                const existingCardQuery = await cardsCollection.where('rfid', '==', cardData.rfid).get();
-                if (!existingCardQuery.empty) throw new Error('RFID card already registered');
-                
-                const existingAdmissionQuery = await cardsCollection.where('admissionNo', '==', cardData.admissionNo).get();
-                if (!existingAdmissionQuery.empty) throw new Error('Admission number already registered');
-                
-                const docRef = await cardsCollection.add({
-                    ...cardData,
-                    status: 'active',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await transactionsCollection.add({
-                    cardId: docRef.id,
-                    rfid: cardData.rfid,
-                    type: 'registration',
-                    amount: cardData.balance,
-                    previousBalance: 0,
-                    newBalance: cardData.balance,
-                    description: 'Initial card registration',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                return docRef.id;
-            } catch (error) {
-                console.error('Error registering card:', error);
-                throw error;
-            }
-        }
-        
-        async function updateCardBalance(cardId, newBalance, transactionData) {
-            if (!isFirebaseConnected) throw new Error('Firebase not connected');
-            
-            try {
-                await cardsCollection.doc(cardId).update({
-                    balance: newBalance,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await transactionsCollection.add({
-                    ...transactionData,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                return true;
-            } catch (error) {
-                console.error('Error updating card balance:', error);
-                throw error;
-            }
-        }
-        
-        async function findCardByRFID(rfid) {
-            if (!isFirebaseConnected) return null;
-            
-            try {
-                const querySnapshot = await cardsCollection.where('rfid', '==', rfid).get();
-                if (querySnapshot.empty) return null;
-                
-                const doc = querySnapshot.docs[0];
-                return { id: doc.id, ...doc.data() };
-            } catch (error) {
-                console.error('Error finding card:', error);
-                return null;
-            }
-        }
-
-        // ==================== UI FUNCTIONS ====================
-        
-        function updateStats() {
-            const totalBalance = allCards.reduce((sum, card) => sum + (card.balance || 0), 0);
-            const activeCards = allCards.filter(card => card.status === 'active').length;
-            const totalTransactions = allTransactions.length;
-            
-            statsContainer.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>${allCards.length}</h3>
-                        <p>Total Cards</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>₹${totalBalance.toFixed(2)}</h3>
-                        <p>Total Balance</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>${activeCards}</h3>
-                        <p>Active Cards</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>${totalTransactions}</h3>
-                        <p>Total Transactions</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        navTabs.forEach(tab => {
-            tab.addEventListener('click', async () => {
-                const tabId = tab.getAttribute('data-tab');
-                
-                navTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                
-                clearStatusMessages();
-                
-                if (tabId === 'cards') {
-                    await updateCardsTable();
-                }
-                
-                if (tabId === 'recharge') {
-                    await updateRechargeHistory();
-                }
-                
-                if (tabId === 'cafeteria' && menuItems.length === 0) {
-                    menuItems = await loadMenuFromFirebase();
-                }
-                
-                // Update stats whenever switching tabs
-                updateStats();
-            });
-        });
-
-        function validateRFID(rfid) {
-            if (!rfid || rfid.trim() === '') return 'RFID number is required';
-            if (rfid.length < 6) return 'RFID number must be at least 6 characters';
-            if (!/^[0-9A-Za-z]+$/.test(rfid)) return 'RFID number can only contain letters and numbers';
-            return null;
-        }
-
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('student-name').value;
-            const admissionNo = document.getElementById('admission-no').value;
-            const studentClass = document.getElementById('student-class').value;
-            const studentSection = document.getElementById('student-section').value;
-            const studentHouse = document.getElementById('student-house').value;
-            const rfidNumber = document.getElementById('rfid-number').value;
-            const amount = parseFloat(document.getElementById('initial-amount').value);
-            
-            if (amount < 100) {
-                showStatus('Minimum initial amount is ₹100.', 'error', 'register-status');
-                return;
-            }
-            
-            const rfidError = validateRFID(rfidNumber);
-            if (rfidError) {
-                showStatus(rfidError, 'error', 'register-status');
-                return;
-            }
-            
-            const registerBtn = document.getElementById('register-btn');
-            const originalText = registerBtn.innerHTML;
-            registerBtn.innerHTML = '<div class="loading-spinner"></div> Registering...';
-            registerBtn.disabled = true;
-            
-            try {
-                const cardData = {
-                    name: name,
-                    admissionNo: admissionNo,
-                    class: studentClass,
-                    section: studentSection,
-                    house: studentHouse,
-                    rfid: rfidNumber,
-                    balance: amount,
-                    status: "active"
-                };
-                
-                await registerCardToFirebase(cardData);
-                
-                showStatus(`✅ Card ${rfidNumber} registered for ${name} with ₹${amount.toFixed(2)} balance`, 'success', 'register-status');
-                
-                registerForm.reset();
-                
-                allCards = await loadCardsFromFirebase();
-                updateStats();
-                
-                if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
-                    await updateCardsTable();
-                }
-                
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'register-status');
-            } finally {
-                registerBtn.innerHTML = originalText;
-                registerBtn.disabled = false;
-            }
-        });
-        
-        checkBalanceBtn.addEventListener('click', async function() {
-            const rfidNumber = searchRfidInput.value.trim();
-            
-            if (!rfidNumber) {
-                showStatus('Please enter RFID card number.', 'error', 'balance-status');
-                return;
-            }
-            
-            const rfidError = validateRFID(rfidNumber);
-            if (rfidError) {
-                showStatus(rfidError, 'error', 'balance-status');
-                return;
-            }
-            
-            const checkBalanceBtn = document.getElementById('check-balance-btn');
-            const originalText = checkBalanceBtn.innerHTML;
-            checkBalanceBtn.innerHTML = '<div class="loading-spinner"></div> Checking...';
-            checkBalanceBtn.disabled = true;
-            
-            try {
-                const card = await findCardByRFID(rfidNumber);
-                
-                if (!card) {
-                    showStatus(`❌ RFID card ${rfidNumber} not found.`, 'error', 'balance-status');
-                    balanceDisplay.style.display = 'none';
-                    cafeteriaMenu.style.display = 'none';
-                    return;
-                }
-                
-                document.getElementById('balance-amount').textContent = card.balance.toFixed(2);
-                document.getElementById('card-holder').textContent = card.name;
-                document.getElementById('card-admission').textContent = card.admissionNo;
-                document.getElementById('card-class').textContent = card.class;
-                document.getElementById('card-section').textContent = card.section;
-                balanceDisplay.style.display = 'block';
-                
-                currentCard = card;
-                cafeteriaMenu.style.display = 'block';
-                
-                if (menuItems.length === 0) {
-                    menuItems = await loadMenuFromFirebase();
-                }
-                
-                loadMenuItems();
-                currentOrder = [];
-                updateOrderSummary();
-                
-                showStatus(`✅ Card ${rfidNumber} loaded. Balance: ₹${card.balance.toFixed(2)}`, 'success', 'balance-status');
-                
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'balance-status');
-            } finally {
-                checkBalanceBtn.innerHTML = originalText;
-                checkBalanceBtn.disabled = false;
-            }
-        });
-        
-        checkRechargeBtn.addEventListener('click', async function() {
-            const rfidNumber = rechargeRfidInput.value.trim();
-            
-            if (!rfidNumber) {
-                showStatus('Please enter RFID card number.', 'error', 'recharge-status');
-                return;
-            }
-            
-            const rfidError = validateRFID(rfidNumber);
-            if (rfidError) {
-                showStatus(rfidError, 'error', 'recharge-status');
-                return;
-            }
-            
-            const checkRechargeBtn = document.getElementById('check-recharge-btn');
-            const originalText = checkRechargeBtn.innerHTML;
-            checkRechargeBtn.innerHTML = '<div class="loading-spinner"></div> Checking...';
-            checkRechargeBtn.disabled = true;
-            
-            try {
-                const card = await findCardByRFID(rfidNumber);
-                
-                if (!card) {
-                    showStatus(`❌ RFID card ${rfidNumber} not found.`, 'error', 'recharge-status');
-                    rechargeDetails.style.display = 'none';
-                    return;
-                }
-                
-                document.getElementById('recharge-balance').textContent = card.balance.toFixed(2);
-                document.getElementById('recharge-holder').textContent = card.name;
-                document.getElementById('recharge-admission').textContent = card.admissionNo;
-                document.getElementById('recharge-class').textContent = card.class;
-                rechargeDetails.style.display = 'block';
-                
-                rechargeCard = card;
-                amountOptions.forEach(option => option.classList.remove('selected'));
-                customAmountInput.value = '';
-                
-                showStatus(`✅ Card ${rfidNumber} loaded. Balance: ₹${card.balance.toFixed(2)}`, 'success', 'recharge-status');
-                
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'recharge-status');
-            } finally {
-                checkRechargeBtn.innerHTML = originalText;
-                checkRechargeBtn.disabled = false;
-            }
-        });
-        
-        amountOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                amountOptions.forEach(opt => opt.classList.remove('selected'));
-                this.classList.add('selected');
-                customAmountInput.value = '';
-            });
-        });
-        
-        customAmountInput.addEventListener('input', function() {
-            amountOptions.forEach(opt => opt.classList.remove('selected'));
-        });
-        
-        processRechargeBtn.addEventListener('click', async function() {
-            if (!rechargeCard) {
-                showStatus('Please load a card first.', 'error', 'recharge-status');
-                return;
-            }
-            
-            let rechargeAmount = 0;
-            
-            if (customAmountInput.value.trim()) {
-                rechargeAmount = parseFloat(customAmountInput.value);
-            } else {
-                const selectedOption = document.querySelector('.amount-option.selected');
-                if (selectedOption) {
-                    rechargeAmount = parseFloat(selectedOption.getAttribute('data-amount'));
-                }
-            }
-            
-            if (rechargeAmount <= 0 || isNaN(rechargeAmount)) {
-                showStatus('Please select or enter a valid recharge amount.', 'error', 'recharge-status');
-                return;
-            }
-            
-            if (rechargeAmount < 50) {
-                showStatus('Minimum recharge amount is ₹50.', 'error', 'recharge-status');
-                return;
-            }
-            
-            const notes = document.getElementById('recharge-notes').value.trim();
-            
-            const processBtn = document.getElementById('process-recharge-btn');
-            const originalText = processBtn.innerHTML;
-            processBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
-            processBtn.disabled = true;
-            
-            try {
-                const newBalance = rechargeCard.balance + rechargeAmount;
-                
-                await updateCardBalance(rechargeCard.id, newBalance, {
-                    cardId: rechargeCard.id,
-                    rfid: rechargeCard.rfid,
-                    type: 'recharge',
-                    amount: rechargeAmount,
-                    previousBalance: rechargeCard.balance,
-                    newBalance: newBalance,
-                    description: notes || 'Card recharge'
-                });
-                
-                rechargeCard.balance = newBalance;
-                document.getElementById('recharge-balance').textContent = rechargeCard.balance.toFixed(2);
-                
-                showStatus(`✅ Added ₹${rechargeAmount.toFixed(2)} to card ${rechargeCard.rfid}. New balance: ₹${rechargeCard.balance.toFixed(2)}`, 'success', 'recharge-status');
-                
-                amountOptions.forEach(opt => opt.classList.remove('selected'));
-                customAmountInput.value = '';
-                document.getElementById('recharge-notes').value = '';
-                
-                await updateRechargeHistory();
-                allCards = await loadCardsFromFirebase();
-                updateStats();
-                
-                if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
-                    await updateCardsTable();
-                }
-                
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'recharge-status');
-            } finally {
-                processBtn.innerHTML = originalText;
-                processBtn.disabled = false;
-            }
-        });
-        
-        cancelRechargeBtn.addEventListener('click', function() {
-            rechargeDetails.style.display = 'none';
-            rechargeRfidInput.value = '';
-            rechargeCard = null;
-            showStatus('Recharge cancelled.', 'info', 'recharge-status');
-        });
-        
-        placeOrderBtn.addEventListener('click', async function() {
-            if (!currentCard) {
-                showStatus('No card selected. Please check balance first.', 'error', 'order-status');
-                return;
-            }
-            
-            if (currentOrder.length === 0) {
-                showStatus('Please select at least one item from the menu.', 'error', 'order-status');
-                return;
-            }
-            
-            const orderTotal = currentOrder.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-            if (orderTotal > currentCard.balance) {
-                showStatus(`❌ Insufficient balance. Order total: ₹${orderTotal.toFixed(2)}`, 'error', 'order-status');
-                return;
-            }
-            
-            const placeOrderBtn = document.getElementById('place-order-btn');
-            const originalText = placeOrderBtn.innerHTML;
-            placeOrderBtn.innerHTML = '<div class="loading-spinner"></div> Processing...';
-            placeOrderBtn.disabled = true;
-            
-            try {
-                const newBalance = currentCard.balance - orderTotal;
-                const orderDescription = currentOrder.map(item => 
-                    `${item.quantity}x ${item.name} (₹${item.price})`
-                ).join(', ');
-                
-                await updateCardBalance(currentCard.id, newBalance, {
-                    cardId: currentCard.id,
-                    rfid: currentCard.rfid,
-                    type: 'purchase',
-                    amount: -orderTotal,
-                    previousBalance: currentCard.balance,
-                    newBalance: newBalance,
-                    description: `Cafeteria: ${orderDescription}`
-                });
-                
-                currentCard.balance = newBalance;
-                document.getElementById('balance-amount').textContent = currentCard.balance.toFixed(2);
-                
-                showStatus(`✅ Order placed! ₹${orderTotal.toFixed(2)} deducted. New balance: ₹${currentCard.balance.toFixed(2)}`, 'success', 'order-status');
-                
-                currentOrder = [];
-                updateOrderSummary();
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                
-                allCards = await loadCardsFromFirebase();
-                updateStats();
-                
-                if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
-                    await updateCardsTable();
-                }
-                
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error', 'order-status');
-            } finally {
-                placeOrderBtn.innerHTML = originalText;
-                placeOrderBtn.disabled = false;
-            }
-        });
-        
-        clearOrderBtn.addEventListener('click', function() {
-            currentOrder = [];
-            updateOrderSummary();
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            showStatus('Order cleared.', 'success', 'order-status');
-        });
-        
-        searchCardsInput.addEventListener('input', function() {
-            updateCardsTable();
-        });
-        
-        refreshCardsBtn.addEventListener('click', async function() {
-            await updateCardsTable();
-            showStatus('Cards list refreshed.', 'success', 'cards-status');
-        });
-        
-        exportCardsBtn.addEventListener('click', function() {
-            if (allCards.length === 0) {
-                showStatus('No cards to export.', 'error', 'cards-status');
-                return;
-            }
-            
-            let csv = 'Student Name,Admission No,RFID Number,Class,Section,House,Balance,Status\n';
-            
-            allCards.forEach(card => {
-                csv += `"${card.name}","${card.admissionNo}","${card.rfid}","${card.class}","${card.section}","${card.house}","${card.balance || 0}","${card.status || 'active'}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `rfid_cards_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            showStatus('✅ Cards data exported successfully.', 'success', 'cards-status');
-        });
-        
-        prevPageBtn.addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                updateCardsTable();
-            }
-        });
-        
-        nextPageBtn.addEventListener('click', function() {
-            const totalPages = Math.ceil(allCards.length / cardsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                updateCardsTable();
-            }
-        });
-
-        // ==================== HELPER FUNCTIONS ====================
-        
-        function showStatus(message, type, elementId) {
-            const statusElement = document.getElementById(elementId);
-            statusElement.textContent = message;
-            statusElement.className = 'status-message ' + type;
-            
-            setTimeout(() => {
-                statusElement.style.display = 'none';
-            }, 5000);
-        }
-        
-        function clearStatusMessages() {
-            document.querySelectorAll('.status-message').forEach(element => {
-                element.style.display = 'none';
-            });
-        }
-        
         function loadMenuItems() {
             menuItemsContainer.innerHTML = '';
             
@@ -2019,9 +2109,9 @@
                     <div class="menu-item-image" style="background-image: url('${item.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'}');"></div>
                     <div class="menu-item-content">
                         <div class="menu-item-title">${item.name}</div>
-                        <div style="font-size: 0.95rem; color: var(--gray); margin-bottom: 12px;">${item.category || 'Food'}</div>
+                        <div style="font-size: 0.9rem; color: #6c757d; margin-bottom: 8px;">${item.category || 'Food'}</div>
                         <div class="menu-item-price">₹${item.price}</div>
-                        <button class="btn" style="width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem;" data-add="${item.id || item.name}">
+                        <button class="btn" style="width: 100%; margin-top: 10px;" data-add="${item.id || item.name}">
                             <i class="fas fa-plus"></i> Add to Order
                         </button>
                     </div>
@@ -2065,7 +2155,7 @@
             orderItemsContainer.innerHTML = '';
             
             if (currentOrder.length === 0) {
-                orderItemsContainer.innerHTML = '<li style="text-align: center; color: var(--gray); padding: 40px; font-style: italic;">No items added yet. Select items from the menu above.</li>';
+                orderItemsContainer.innerHTML = '<li style="text-align: center; color: #7f8c8d;">No items added to order yet.</li>';
                 document.getElementById('order-total').textContent = '0.00';
                 return;
             }
@@ -2080,9 +2170,9 @@
                 li.innerHTML = `
                     <div>
                         <strong>${item.name}</strong>
-                        <div style="font-size: 0.95rem; color: var(--gray);">₹${item.price} x ${item.quantity}</div>
+                        <div style="font-size: 0.9rem; color: #7f8c8d;">₹${item.price} x ${item.quantity}</div>
                     </div>
-                    <div style="font-weight: 700; color: var(--dark);">₹${itemTotal.toFixed(2)}</div>
+                    <div style="font-weight: 700;">₹${itemTotal.toFixed(2)}</div>
                 `;
                 orderItemsContainer.appendChild(li);
             });
@@ -2091,12 +2181,8 @@
         }
         
         async function updateCardsTable() {
-            if (allCards.length === 0) {
-                allCards = await loadCardsFromFirebase();
-                updateStats();
-            }
-            
             const searchTerm = searchCardsInput.value.toLowerCase();
+            
             const filteredCards = allCards.filter(card => {
                 return (
                     card.name.toLowerCase().includes(searchTerm) ||
@@ -2107,28 +2193,21 @@
                 );
             });
             
-            const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
-            const startIndex = (currentPage - 1) * cardsPerPage;
-            const endIndex = startIndex + cardsPerPage;
-            const paginatedCards = filteredCards.slice(startIndex, endIndex);
-            
             cardsTableBody.innerHTML = '';
             
-            if (paginatedCards.length === 0) {
+            if (filteredCards.length === 0) {
                 cardsTableBody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 60px; color: var(--gray); font-style: italic;">
-                            ${searchTerm ? 'No cards match your search.' : 'No cards registered yet.'}
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #6c757d;">
+                            No cards found. ${searchTerm ? 'Try a different search.' : 'Register a card to get started.'}
                         </td>
                     </tr>
                 `;
                 cardsCount.textContent = '0';
-                prevPageBtn.disabled = true;
-                nextPageBtn.disabled = true;
                 return;
             }
             
-            paginatedCards.forEach(card => {
+            filteredCards.forEach(card => {
                 const row = document.createElement('tr');
                 
                 let statusBadge = '';
@@ -2145,13 +2224,13 @@
                 row.innerHTML = `
                     <td><strong>${card.name}</strong></td>
                     <td>${card.admissionNo}</td>
-                    <td><code style="background: rgba(106, 17, 203, 0.1); padding: 5px 10px; border-radius: 8px; font-family: monospace;">${card.rfid}</code></td>
+                    <td><code>${card.rfid}</code></td>
                     <td>Class ${card.class} - ${card.section}</td>
-                    <td><span style="color: ${card.house === 'Red' ? '#ff416c' : card.house === 'Blue' ? '#2575fc' : card.house === 'Green' ? '#00b09b' : '#ffa726'}; font-weight: 600;">${card.house} House</span></td>
-                    <td><strong style="color: var(--success);">₹${card.balance ? card.balance.toFixed(2) : '0.00'}</strong></td>
+                    <td>${card.house} House</td>
+                    <td><strong>₹${card.balance ? card.balance.toFixed(2) : '0.00'}</strong></td>
                     <td>${statusBadge}</td>
                     <td>
-                        <button class="btn" style="padding: 10px 20px; font-size: 0.9rem; background: linear-gradient(135deg, var(--warning), #ffb74d);" onclick="rechargeCardFromTable('${card.rfid}')">
+                        <button class="btn" style="padding: 8px 12px; font-size: 0.9rem;" onclick="rechargeCardFromTable('${card.rfid}')">
                             <i class="fas fa-coins"></i> Recharge
                         </button>
                     </td>
@@ -2160,19 +2239,18 @@
                 cardsTableBody.appendChild(row);
             });
             
-            cardsCount.textContent = `${filteredCards.length} cards`;
-            prevPageBtn.disabled = currentPage === 1;
-            nextPageBtn.disabled = currentPage === totalPages;
+            cardsCount.textContent = filteredCards.length;
         }
         
         async function updateRechargeHistory() {
             const container = document.getElementById('recent-recharges');
             
             allTransactions = await loadTransactionsFromFirebase();
+            
             const rechargeTransactions = allTransactions.filter(t => t.type === 'recharge' || t.type === 'registration');
             
             if (rechargeTransactions.length === 0) {
-                container.innerHTML = '<p style="color: var(--gray); text-align: center; padding: 40px; font-style: italic;">No recharge history available.</p>';
+                container.innerHTML = '<p>No recharge history available. Recharges will appear here.</p>';
                 return;
             }
             
@@ -2188,16 +2266,17 @@
                 const cardName = card ? card.name : 'Unknown';
                 
                 let dateStr = 'Recent';
-                if (transaction.timestamp && transaction.timestamp.toDate) {
-                    dateStr = transaction.timestamp.toDate().toLocaleDateString();
-                } else if (transaction.timestamp) {
-                    dateStr = new Date(transaction.timestamp).toLocaleDateString();
+                if (transaction.timestamp) {
+                    const timestamp = typeof transaction.timestamp === 'object' && transaction.timestamp.toDate 
+                        ? transaction.timestamp.toDate() 
+                        : new Date(transaction.timestamp);
+                    dateStr = timestamp.toLocaleDateString();
                 }
                 
                 html += `<tr>
                     <td>${dateStr}</td>
-                    <td><code style="background: rgba(106, 17, 203, 0.1); padding: 5px 10px; border-radius: 8px; font-family: monospace;">${transaction.rfid}</code><br><small style="color: var(--gray);">${cardName}</small></td>
-                    <td style="color: var(--success); font-weight: 700; font-size: 1.1rem;">+ ₹${transaction.amount.toFixed(2)}</td>
+                    <td><code>${transaction.rfid}</code><br><small>${cardName}</small></td>
+                    <td style="color: #27ae60; font-weight: 700;">+ ₹${transaction.amount.toFixed(2)}</td>
                     <td>${transaction.description || 'No notes'}</td>
                 </tr>`;
             }
@@ -2206,6 +2285,104 @@
             container.innerHTML = html;
         }
         
+        async function loadTransactions() {
+            const container = document.getElementById('transactions-container');
+            
+            allTransactions = await loadTransactionsFromFirebase();
+            
+            if (allTransactions.length === 0) {
+                container.innerHTML = '<p>No transactions available.</p>';
+                return;
+            }
+            
+            let html = '<div style="overflow-x: auto;">';
+            html += '<table class="data-table">';
+            html += '<thead><tr><th>Date</th><th>RFID Card</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead>';
+            html += '<tbody>';
+            
+            for (const transaction of allTransactions) {
+                const card = allCards.find(c => c.rfid === transaction.rfid);
+                const cardName = card ? card.name : 'Unknown';
+                
+                let dateStr = 'Recent';
+                if (transaction.timestamp) {
+                    const timestamp = typeof transaction.timestamp === 'object' && transaction.timestamp.toDate 
+                        ? transaction.timestamp.toDate() 
+                        : new Date(transaction.timestamp);
+                    dateStr = timestamp.toLocaleDateString() + ' ' + timestamp.toLocaleTimeString();
+                }
+                
+                let typeBadge = '';
+                if (transaction.type === 'recharge') {
+                    typeBadge = '<span class="badge badge-success">Recharge</span>';
+                } else if (transaction.type === 'purchase') {
+                    typeBadge = '<span class="badge badge-warning">Purchase</span>';
+                } else if (transaction.type === 'registration') {
+                    typeBadge = '<span class="badge badge-info">Registration</span>';
+                } else {
+                    typeBadge = `<span class="badge">${transaction.type}</span>`;
+                }
+                
+                let amountColor = '#27ae60';
+                if (transaction.amount < 0) {
+                    amountColor = '#e74c3c';
+                }
+                
+                html += `<tr>
+                    <td>${dateStr}</td>
+                    <td><code>${transaction.rfid}</code><br><small>${cardName}</small></td>
+                    <td>${typeBadge}</td>
+                    <td style="color: ${amountColor}; font-weight: 700;">${transaction.amount >= 0 ? '+' : ''}₹${Math.abs(transaction.amount).toFixed(2)}</td>
+                    <td>${transaction.description || 'No description'}</td>
+                </tr>`;
+            }
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        
+        function exportToCSV() {
+            if (allCards.length === 0) {
+                showStatus('No cards to export.', 'error', 'cards-status');
+                return;
+            }
+            
+            let csv = 'Student Name,Admission No,RFID Number,Class,Section,House,Balance,Status\n';
+            
+            allCards.forEach(card => {
+                csv += `"${card.name}","${card.admissionNo}","${card.rfid}","${card.class}","${card.section}","${card.house}","${card.balance || 0}","${card.status || 'active'}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rfid_cards_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showStatus('Cards data exported successfully.', 'success', 'cards-status');
+        }
+        
+        function showStatus(message, type, elementId) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = 'status-message ' + type;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        function clearStatusMessages() {
+            document.querySelectorAll('.status-message').forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+        
+        // Global function to recharge from table
         window.rechargeCardFromTable = function(rfid) {
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.querySelector('[data-tab="recharge"]').classList.add('active');
@@ -2218,41 +2395,6 @@
             rechargeRfidInput.value = rfid;
             checkRechargeBtn.click();
         };
-        
-        // ==================== INITIALIZATION ====================
-        
-        async function initializeApp() {
-            if (!isFirebaseConnected) {
-                showStatus('Running in offline mode. Data will not be saved.', 'error', 'register-status');
-                menuItems = getDefaultMenuItems();
-            } else {
-                try {
-                    allCards = await loadCardsFromFirebase();
-                    menuItems = await loadMenuFromFirebase();
-                    allTransactions = await loadTransactionsFromFirebase();
-                    
-                    showStatus('✅ Connected to Firebase! System is ready.', 'success', 'register-status');
-                } catch (error) {
-                    console.error('Error loading initial data:', error);
-                    showStatus('Error loading data from Firebase.', 'error', 'register-status');
-                    menuItems = getDefaultMenuItems();
-                }
-            }
-            
-            updateStats();
-            
-            if (document.querySelector('[data-tab="cards"]').classList.contains('active')) {
-                await updateCardsTable();
-            }
-            
-            if (document.querySelector('[data-tab="recharge"]').classList.contains('active')) {
-                await updateRechargeHistory();
-            }
-            
-            console.log('RFID Card Management System initialized!');
-        }
-        
-        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
 </html>
